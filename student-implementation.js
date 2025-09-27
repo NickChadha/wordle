@@ -31,8 +31,8 @@ function initializeGame() {
     gameOver = false;
     gameWon = false;
 
-    resetBoard()
-    hideModal()
+    resetBoard();
+    hideModal();
     
     // TODO: Get a random word from the word list
     // HINT: Use WordleWords.getRandomWord()
@@ -58,8 +58,35 @@ function initializeGame() {
  */
 function handleKeyPress(key) {
     // TODO: Check if game is over - if so, return early
+    if (gameOver) {
+        return;
+    }
     
+
     // TODO: Handle letter keys (A-Z)
+    let pattern = /^[A-Z]$/
+    if (pattern.test(key)) {
+        if (currentGuess.length < WORD_LENGTH) {
+            currentGuess += key;
+            updateTileDisplay(getTile(currentRow, currentGuess.length - 1), key);
+            return
+        }
+    } 
+    if (key == "ENTER") {
+        if (isGuessComplete()) {
+            submitGuess();
+        } else {
+            console.warn('Please type a 5 letter word.');
+            showMessage('Invalid Guess', 'error', 5000);
+        }
+        return
+    }
+    if (key == "BACKSPACE") {
+        if (currentGuess.length > 0) {
+            currentGuess = currentGuess.substring(0, currentGuess.length - 1)
+            updateTileDisplay(getTile(currentRow, currentGuess.length), '')
+        }
+    }
     // HINT: Use regex /^[A-Z]$/ to test if key is a letter
     // HINT: Check if currentGuess.length < WORD_LENGTH before adding
     // HINT: Use getTile() and updateTileDisplay() to show the letter
@@ -67,6 +94,8 @@ function handleKeyPress(key) {
     // TODO: Handle ENTER key
     // HINT: Check if guess is complete using isGuessComplete()
     // HINT: Call submitGuess() if complete, show error message if not
+
+
     
     // TODO: Handle BACKSPACE key  
     // HINT: Check if there are letters to remove
