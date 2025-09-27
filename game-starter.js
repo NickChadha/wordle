@@ -139,7 +139,7 @@ function setTileState(tile, state) {
 function updateKeyboardKey(key, state) {
     const keyElement = document.querySelector(`[data-key="${key.toUpperCase()}"]`);
     if (!keyElement) return;
-    
+
     // Don't downgrade key colors (correct > present > absent)
     const currentClasses = keyElement.classList;
     
@@ -462,7 +462,7 @@ modal.addEventListener('click', (event) => {
  */
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
-    
+
     // Students will implement this function
     if (typeof initializeGame === 'function') {
         initializeGame();

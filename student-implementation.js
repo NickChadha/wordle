@@ -25,7 +25,7 @@
  */
 function initializeGame() {
     // TODO: Reset game state variables
-    currentWord = WordleWords.getRandomWord();  // Set this to a random word
+    currentWord = WordleWords.getRandomWord().toUpperCase();  // Set this to a random word
     currentGuess = '';
     currentRow = 0;
     gameOver = false;
@@ -58,12 +58,10 @@ function initializeGame() {
  */
 function handleKeyPress(key) {
     // TODO: Check if game is over - if so, return early
-    if (gameOver) {
+    if (!validateInput(key, currentGuess)) {
         return;
     }
     
-
-    // TODO: Handle letter keys (A-Z)
     let pattern = /^[A-Z]$/
     if (pattern.test(key)) {
         if (currentGuess.length < WORD_LENGTH) {
@@ -77,7 +75,7 @@ function handleKeyPress(key) {
             submitGuess();
         } else {
             console.warn('Please type a 5 letter word.');
-            showMessage('Invalid Guess', 'error', 5000);
+            showMessage('Invalid Guess: Please type a 5 letter word', 'error', 5000);
         }
         return
     }
@@ -87,6 +85,9 @@ function handleKeyPress(key) {
             updateTileDisplay(getTile(currentRow, currentGuess.length), '')
         }
     }
+
+    // TODO: Handle letter keys (A-Z)
+    
     // HINT: Use regex /^[A-Z]$/ to test if key is a letter
     // HINT: Check if currentGuess.length < WORD_LENGTH before adding
     // HINT: Use getTile() and updateTileDisplay() to show the letter
@@ -115,6 +116,48 @@ function handleKeyPress(key) {
  * - Handle win/lose conditions
  */
 function submitGuess() {
+    if (isGuessComplete() && WordleWords.isValidWord(currentGuess)) {
+        let guess_results = ['', '', '', '', ''];
+        let current_word_array = [currentWord[0], currentWord[1], currentWord[2], currentWord[3], currentWord[4]];
+
+        for (let guess_index = 0; guess_index < 5; guess_index++) {
+            let letter_result = checkLetter(currentGuess[guess_index], guess_index, current_word_array);
+            if (letter_result == 'correct') {
+                guess_results[guess_index] = 'correct';
+                current_word_array[guess_index] = '-';
+            }
+        }
+        for (let guess_index = 0; guess_index < 5; guess_index++) {
+            if (guess_results[guess_index] == '') {
+                let letter_result = checkLetter(currentGuess[guess_index], guess_index, current_word_array);
+                if (letter_result == 'present') {
+                    guess_results[guess_index] = 'present';
+                    current_word_array[current_word_array.indexOf(currentGuess[guess_index].toUpperCase())] = '-';
+                }
+                if (letter_result == 'absent') {
+                    guess_results[guess_index] = 'absent';
+                }
+            }
+        }
+        //let results_debug = guess_results[0] + guess_results[1] + guess_results[2] + guess_results[3] + guess_results[4]
+        //showMessage(results_debug, 'error', 5000)
+
+        for (let col_index = 0; col_index < 5; col_index++) {
+            setTileState(getTile(currentRow, col_index), guess_results[col_index]);
+        }
+        updateKeyboardColors(currentGuess, guess_results);
+
+        let isCorrect = (currentGuess.toUpperCase() == currentWord.toUpperCase());
+        processRowReveal(currentRow, guess_results);
+        updateGameState(isCorrect);
+
+    } else {
+        console.warn('Please type a valid 5 letter word.');
+        showMessage('Invalid Guess: Please type a valid 5 letter word' + currentWord, 'error', 5000);
+        shakeRow(currentRow);
+        return;
+    }
+    
     // TODO: Validate guess is complete
     // HINT: Use isGuessComplete()
     
@@ -155,17 +198,17 @@ function submitGuess() {
  * - Handle duplicate letters correctly (this is the tricky part!)
  */
 function checkLetter(guessLetter, position, targetWord) {
-    // TODO: Convert inputs to uppercase for comparison
+    guessLetter = guessLetter.toUpperCase();
     
-    // TODO: Check if letter is in correct position
-    // HINT: Compare targetWord[position] with guessLetter
-    
-    // TODO: Check if letter exists elsewhere in target
-    // HINT: Use targetWord.includes() or indexOf()
-    
-    // TODO: Handle duplicate letters correctly
-    // This is the most challenging part - you may want to implement
-    // a more sophisticated algorithm that processes the entire word
+    if (guessLetter == targetWord[position]) {
+        return 'correct';
+    }
+
+    if (targetWord.indexOf(guessLetter) > -1) {
+        return 'present';
+    } else {
+        return 'absent';
+    }
     
     console.log('Checking letter:', guessLetter, 'at position:', position); // Remove this line
     return 'absent'; // Replace with actual logic
@@ -181,6 +224,20 @@ function checkLetter(guessLetter, position, targetWord) {
  * - Show appropriate end game modal
  */
 function updateGameState(isCorrect) {
+    if (isCorrect) {
+        gameWon = true;
+        gameOver = true;
+        showEndGameModal(gameWon, currentWord);
+    } else {
+        if (currentRow >= MAX_GUESSES - 1) {
+            gameOver = true;
+            showEndGameModal(gameWon, currentWord);
+        } else {
+            currentRow += 1;
+            currentGuess = '';
+        }
+    }
+    
     // TODO: Handle win condition
     // HINT: Set gameWon and gameOver flags, call showEndGameModal
     
@@ -204,6 +261,10 @@ function updateGameState(isCorrect) {
  * - Don't downgrade key colors
  */
 function updateKeyboardColors(guess, results) {
+    for (let col_index = 0; col_index < 5; col_index++) {
+        updateKeyboardKey(guess[col_index], results[col_index]);
+    }
+    
     // TODO: Loop through each letter in the guess
     
     // TODO: Get the keyboard key element
@@ -225,6 +286,15 @@ function updateKeyboardColors(guess, results) {
  * - Trigger celebration if player won this round
  */
 function processRowReveal(rowIndex, results) {
+    let matches = true;
+    for (let i = 0; i < 5; i++) {
+        if (results[i] != 'correct') {
+            matches = false;
+        }
+    }
+    if (matches) { 
+        celebrateRow(currentRow);
+    }
     // TODO: Check if all results are 'correct'
     // HINT: Use results.every() method
     
@@ -244,6 +314,10 @@ function processRowReveal(rowIndex, results) {
  * - Update game statistics
  */
 function showEndGameModal(won, targetWord) {
+    updateStats(won);
+    showModal(won, targetWord, currentRow + 1);
+    
+    
     // TODO: Create appropriate message based on won parameter
     // HINT: For wins, include number of guesses used
     // HINT: For losses, reveal the target word
@@ -268,6 +342,27 @@ function showEndGameModal(won, targetWord) {
  * - Validate BACKSPACE key (only if letters to remove)
  */
 function validateInput(key, currentGuess) {
+    if (gameOver) {
+        return false;
+    } 
+
+    let pattern = /^[A-Z]$/
+    if (pattern.test(key)) {
+        if (currentGuess.length < WORD_LENGTH) {
+            return true;
+        }
+    } 
+    if (key == "ENTER") {
+        if (isGuessComplete()) {
+            return true;
+        } 
+    }
+    if (key == "BACKSPACE") {
+        if (currentGuess.length > 0) {
+            return true;
+        }
+    }
+    return false;
     // TODO: Return false if game is over
     
     // TODO: Handle letter keys
