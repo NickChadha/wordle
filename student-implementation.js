@@ -17,7 +17,7 @@
  * Initialize a new game
  * POINTS: 10
  * 
- * TODO: Complete this function to:
+ * Complete this function to:
  * - Reset all game state variables
  * - Get a random word from the word list
  * - Clear the game board
@@ -25,11 +25,14 @@
  */
 function initializeGame() {
     // TODO: Reset game state variables
-    currentWord = '';  // Set this to a random word
+    currentWord = WordleWords.getRandomWord();  // Set this to a random word
     currentGuess = '';
     currentRow = 0;
     gameOver = false;
     gameWon = false;
+
+    resetBoard()
+    hideModal()
     
     // TODO: Get a random word from the word list
     // HINT: Use WordleWords.getRandomWord()
