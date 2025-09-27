@@ -24,7 +24,6 @@
  * - Hide any messages or modals
  */
 function initializeGame() {
-    // TODO: Reset game state variables
     currentWord = WordleWords.getRandomWord().toUpperCase();  // Set this to a random word
     currentGuess = '';
     currentRow = 0;
@@ -33,31 +32,18 @@ function initializeGame() {
 
     resetBoard();
     hideModal();
-    
-    // TODO: Get a random word from the word list
-    // HINT: Use WordleWords.getRandomWord()
-    
-    // TODO: Reset the game board
-    // HINT: Use resetBoard()
-    
-    // TODO: Hide any messages
-    // HINT: Use hideModal() and ensure message element is hidden
-    
-    console.log('Game initialized!'); // Remove this line when implementing
 }
 
 /**
  * Handle keyboard input
  * POINTS: 15
  * 
- * TODO: Complete this function to:
  * - Process letter keys (A-Z)
  * - Handle ENTER key for word submission
  * - Handle BACKSPACE for letter deletion
  * - Update the display when letters are added/removed
  */
 function handleKeyPress(key) {
-    // TODO: Check if game is over - if so, return early
     if (!validateInput(key, currentGuess)) {
         return;
     }
@@ -85,31 +71,12 @@ function handleKeyPress(key) {
             updateTileDisplay(getTile(currentRow, currentGuess.length), '')
         }
     }
-
-    // TODO: Handle letter keys (A-Z)
-    
-    // HINT: Use regex /^[A-Z]$/ to test if key is a letter
-    // HINT: Check if currentGuess.length < WORD_LENGTH before adding
-    // HINT: Use getTile() and updateTileDisplay() to show the letter
-    
-    // TODO: Handle ENTER key
-    // HINT: Check if guess is complete using isGuessComplete()
-    // HINT: Call submitGuess() if complete, show error message if not
-
-
-    
-    // TODO: Handle BACKSPACE key  
-    // HINT: Check if there are letters to remove
-    // HINT: Clear the tile display and remove from currentGuess
-    
-    console.log('Key pressed:', key); // Remove this line when implementing
 }
 
 /**
  * Submit and process a complete guess
  * POINTS: 20
  * 
- * TODO: Complete this function to:
  * - Validate the guess is a real word
  * - Check each letter against the target word
  * - Update tile colors and keyboard
@@ -139,8 +106,6 @@ function submitGuess() {
                 }
             }
         }
-        //let results_debug = guess_results[0] + guess_results[1] + guess_results[2] + guess_results[3] + guess_results[4]
-        //showMessage(results_debug, 'error', 5000)
 
         for (let col_index = 0; col_index < 5; col_index++) {
             setTileState(getTile(currentRow, col_index), guess_results[col_index]);
@@ -157,41 +122,12 @@ function submitGuess() {
         shakeRow(currentRow);
         return;
     }
-    
-    // TODO: Validate guess is complete
-    // HINT: Use isGuessComplete()
-    
-    // TODO: Validate guess is a real word
-    // HINT: Use WordleWords.isValidWord()
-    // HINT: Show error message and shake row if invalid
-    
-    // TODO: Check each letter and get results
-    // HINT: Use checkLetter() for each position
-    // HINT: Store results in an array
-    
-    // TODO: Update tile colors immediately
-    // HINT: Loop through results and use setTileState()
-    
-    // TODO: Update keyboard colors
-    // HINT: Call updateKeyboardColors()
-    
-    // TODO: Check if guess was correct
-    // HINT: Compare currentGuess with currentWord
-    
-    // TODO: Update game state
-    // HINT: Call updateGameState()
-    
-    // TODO: Move to next row if game continues
-    // HINT: Increment currentRow and reset currentGuess
-    
-    console.log('Guess submitted:', currentGuess); // Remove this line when implementing
 }
 
 /**
  * Check a single letter against the target word
  * POINTS: 10
  * 
- * TODO: Complete this function to:
  * - Return 'correct' if letter matches position exactly
  * - Return 'present' if letter exists but wrong position
  * - Return 'absent' if letter doesn't exist in target
@@ -209,16 +145,12 @@ function checkLetter(guessLetter, position, targetWord) {
     } else {
         return 'absent';
     }
-    
-    console.log('Checking letter:', guessLetter, 'at position:', position); // Remove this line
-    return 'absent'; // Replace with actual logic
 }
 
 /**
  * Update game state after a guess
  * POINTS: 5
  * 
- * TODO: Complete this function to:
  * - Check if player won (guess matches target)
  * - Check if player lost (used all attempts)
  * - Show appropriate end game modal
@@ -237,14 +169,6 @@ function updateGameState(isCorrect) {
             currentGuess = '';
         }
     }
-    
-    // TODO: Handle win condition
-    // HINT: Set gameWon and gameOver flags, call showEndGameModal
-    
-    // TODO: Handle lose condition  
-    // HINT: Check if currentRow >= MAX_GUESSES - 1
-    
-    console.log('Game state updated. Correct:', isCorrect); // Remove this line
 }
 
 // ========================================
@@ -255,7 +179,6 @@ function updateGameState(isCorrect) {
  * Update keyboard key colors based on guessed letters
  * POINTS: 10
  * 
- * TODO: Complete this function to:
  * - Update each key with appropriate color
  * - Maintain color priority (green > yellow > gray)
  * - Don't downgrade key colors
@@ -264,24 +187,12 @@ function updateKeyboardColors(guess, results) {
     for (let col_index = 0; col_index < 5; col_index++) {
         updateKeyboardKey(guess[col_index], results[col_index]);
     }
-    
-    // TODO: Loop through each letter in the guess
-    
-    // TODO: Get the keyboard key element
-    // HINT: Use document.querySelector with [data-key="LETTER"]
-    
-    // TODO: Apply color with priority system
-    // HINT: Don't change green keys to yellow or gray
-    // HINT: Don't change yellow keys to gray
-    
-    console.log('Updating keyboard colors for:', guess); // Remove this line
 }
 
 /**
  * Process row reveal (simplified - no animations needed)
  * POINTS: 5 (reduced from 15 since animations removed)
  * 
- * TODO: Complete this function to:
  * - Check if all letters were correct
  * - Trigger celebration if player won this round
  */
@@ -295,20 +206,12 @@ function processRowReveal(rowIndex, results) {
     if (matches) { 
         celebrateRow(currentRow);
     }
-    // TODO: Check if all results are 'correct'
-    // HINT: Use results.every() method
-    
-    // TODO: If all correct, trigger celebration
-    // HINT: Use celebrateRow() function
-    
-    console.log('Processing row reveal for row:', rowIndex); // Remove this line
 }
 
 /**
  * Show end game modal with results
  * POINTS: 10
  * 
- * TODO: Complete this function to:
  * - Display appropriate win/lose message
  * - Show the target word
  * - Update game statistics
@@ -316,26 +219,12 @@ function processRowReveal(rowIndex, results) {
 function showEndGameModal(won, targetWord) {
     updateStats(won);
     showModal(won, targetWord, currentRow + 1);
-    
-    
-    // TODO: Create appropriate message based on won parameter
-    // HINT: For wins, include number of guesses used
-    // HINT: For losses, reveal the target word
-    
-    // TODO: Update statistics
-    // HINT: Use updateStats() function
-    
-    // TODO: Show the modal
-    // HINT: Use showModal() function
-    
-    console.log('Showing end game modal. Won:', won, 'Word:', targetWord); // Remove this line
 }
 
 /**
  * Validate user input before processing
  * POINTS: 5
  * 
- * TODO: Complete this function to:
  * - Check if game is over
  * - Validate letter keys (only if guess not full)
  * - Validate ENTER key (only if guess complete)
@@ -363,28 +252,6 @@ function validateInput(key, currentGuess) {
         }
     }
     return false;
-    // TODO: Return false if game is over
-    
-    // TODO: Handle letter keys
-    // HINT: Check if currentGuess.length < WORD_LENGTH
-    
-    // TODO: Handle ENTER key
-    // HINT: Check if currentGuess.length === WORD_LENGTH
-    
-    // TODO: Handle BACKSPACE key
-    // HINT: Check if currentGuess.length > 0
-    
-    console.log('Validating input:', key); // Remove this line
-    return true; // Replace with actual validation logic
 }
-
-// ========================================
-// DEBUGGING HELPERS (REMOVE BEFORE SUBMISSION)
-// ========================================
-
-// Uncomment these lines for debugging help:
-// console.log('Current word:', currentWord);
-// console.log('Current guess:', currentGuess);
-// console.log('Current row:', currentRow);
 
 console.log('Student implementation template loaded. Start implementing the functions above!'); 
