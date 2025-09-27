@@ -118,7 +118,7 @@ function submitGuess() {
 
     } else {
         console.warn('Please type a valid 5 letter word.');
-        showMessage('Invalid Guess: Please type a valid 5 letter word' + currentWord, 'error', 5000);
+        showMessage('Invalid Guess: Please type a valid 5 letter word', 'error', 5000);
         shakeRow(currentRow);
         return;
     }
